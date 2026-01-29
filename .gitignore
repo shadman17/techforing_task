@@ -1,0 +1,54 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pkl
+*.pdb
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+
+# ---- Django ----
+*.log
+*.pot
+*.pyc
+db.sqlite3
+
+# Static & media (generated)
+media/
+staticfiles/
+static/
+.github/workflows/deploy.yml
+
+# Environment configs
+.env
+.env.local
+.env.*
+!env.example
+
+# ---- IDE / Editor ----
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ---- OS files ----
+.DS_Store
+Thumbs.db
+
+# ---- Coverage / test ----
+.coverage
+.coverage.*
+htmlcov/
+pytest_cache/
+.tox/
+.nox/
+
+# ---- Build artifacts ----
+dist/
+build/
+*.egg-info/

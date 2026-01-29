@@ -1,0 +1,56 @@
+services:
+  web:
+    build: .
+    container_name: tenant_api_web
+    env_file: .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - redis
+    command: python manage.py runserver 0.0.0.0:8000
+
+  celery:
+    build: .
+    container_name: tenant_api_celery
+    env_file: .env
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - redis
+    command: celery -A multi_tenant_system worker -l INFO
+
+  celery-beat:
+    build: .
+    container_name: tenant_api_celery_beat
+    env_file: .env
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - redis
+    command: celery -A multi_tenant_system beat -l INFO
+
+  db:
+    image: postgres:16-alpine
+    container_name: tenant_api_db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: tenant_api_redis
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres_data:
