@@ -54,8 +54,6 @@ class Invitation(models.Model):
 
     token = models.CharField(max_length=128, unique=True, db_index=True)
     expiration_date = models.DateTimeField()
-
-    # Bonus metadata
     invited_ip = models.GenericIPAddressField(null=True, blank=True)
     note = models.TextField(blank=True, default="")
 
@@ -77,7 +75,6 @@ class Invitation(models.Model):
 
     @staticmethod
     def generate_token():
-        # simple, strong enough, unique
         return secrets.token_urlsafe(32)
 
     @property

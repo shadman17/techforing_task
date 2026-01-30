@@ -5,6 +5,11 @@ from django.utils import timezone
 from .models import Invitation
 
 
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 @shared_task
 def send_invitation_email(
     invite_email: str, invite_name: str, tenant_name: str, token: str
@@ -19,6 +24,15 @@ def send_invitation_email(
         f"POST {accept_url}\n"
         f'Body: {{"token": "{token}", "password": "YOUR_PASSWORD"}}\n\n'
         f"This invite expires in 7 days.\n"
+    )
+
+    logger.info(
+        "Invitation email sent",
+        extra={
+            "trace_id": None,
+            "user_id": None,
+            "tenant_id": None,
+        },
     )
 
     send_mail(
@@ -38,4 +52,14 @@ def expire_invitations():
         expiration_date__lte=now,
     )
     count = qs.update(status=Invitation.Status.EXPIRED)
+
+    logger.info(
+        "Expired invitations job executed",
+        extra={
+            "trace_id": None,
+            "user_id": None,
+            "tenant_id": None,
+        },
+    )
+
     return f"Expired {count} invitations"

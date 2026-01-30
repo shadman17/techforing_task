@@ -15,7 +15,7 @@ class ExternalServiceCircuitBreakerMiddleware(MiddlewareMixin):
     """
 
     def process_request(self, request):
-        # nothing here (outbound calls happen later)
+
         pass
 
     @staticmethod

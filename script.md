@@ -1,6 +1,6 @@
 # docker compose run --rm web python manage.py shell
 # celery cron job
-Run Only Once!
+# Run Only Once!
 
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
 

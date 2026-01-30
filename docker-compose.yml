@@ -38,8 +38,12 @@ services:
     build: .
     container_name: tenant_api_celery
     env_file: .env
+    environment:
+      SERVICE_NAME: tenant-celery
+      LOG_FILE: /var/log/app/celery.log
     volumes:
       - .:/app
+      - ./logs:/var/log/app
     depends_on:
       - db
       - redis
@@ -49,8 +53,12 @@ services:
     build: .
     container_name: tenant_api_celery_beat
     env_file: .env
+    environment:
+      SERVICE_NAME: tenant-celery-beat
+      LOG_FILE: /var/log/app/celery-beat.log
     volumes:
       - .:/app
+      - ./logs:/var/log/app
     depends_on:
       - db
       - redis

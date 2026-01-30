@@ -25,10 +25,6 @@ def call_external_service(
     """
     domain = urlparse(url).netloc
 
-    # Block if circuit open
-    # from invitations.middleware_circuit import ExternalServiceCircuitBreakerMiddleware
-    # ExternalServiceCircuitBreakerMiddleware.block_if_open(domain, request)
-
     headers = kwargs.pop("headers", {}) or {}
     trace_id = getattr(request, "trace_id", None) if request else None
     if trace_id:
