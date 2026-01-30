@@ -164,39 +164,82 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Logging Configuration
+LOG_FILE = os.getenv("LOG_FILE", "/var/log/app/app.log")
+SERVICE_NAME = os.getenv("SERVICE_NAME", "unknown-service")
+
+# LOGGING = {
+#     "version": 1,
+#     "disable_existing_loggers": False,
+#     "filters": {
+#         "request_context": {
+#             "()": "invitations.logging_filters.RequestContextFilter",
+#         },
+#     },
+#     "formatters": {
+#         "json": {
+#             "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
+#             "format": (
+#                 "%(asctime)s %(levelname)s %(name)s %(message)s "
+#                 "%(service)s %(trace_id)s %(user_id)s %(tenant_id)s"
+#             ),
+#         },
+#     },
+#     "handlers": {
+#         "console": {
+#             "class": "logging.StreamHandler",
+#             "formatter": "json",
+#             "filters": ["request_context"],
+#         },
+#         "file": {
+#             "class": "logging.FileHandler",
+#             "filename": "/var/log/app/app.log",
+#             "formatter": "json",
+#             "filters": ["request_context"],
+#         },
+#     },
+#     "root": {
+#         "handlers": ["console", "file"],
+#         "level": "INFO",
+#     },
+# }
+
+
+import os
+
 SERVICE_NAME = os.getenv("SERVICE_NAME", "unknown-service")
 
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "filters": {
+        "request_context": {
+            "()": "invitations.logging_filters.RequestContextFilter",
+        },
+    },
     "formatters": {
         "json": {
             "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
             "format": (
-                "%(asctime)s "
-                "%(levelname)s "
-                "%(name)s "
-                "%(message)s "
-                "%(service)s "
-                "%(trace_id)s "
-                "%(user_id)s "
-                "%(tenant_id)s"
+                "%(asctime)s %(levelname)s %(name)s %(message)s "
+                "%(service)s %(trace_id)s %(user_id)s %(tenant_id)s"
             ),
-        },
-    },
-    "filters": {
-        "request_context": {
-            "()": "invitations.logging_filters.RequestContextFilter",
         },
     },
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
             "formatter": "json",
+            "filters": ["request_context"],
+        },
+        "file": {
+            "class": "logging.FileHandler",
+            "filename": LOG_FILE,
+            "formatter": "json",
+            "filters": ["request_context"],
         },
     },
     "root": {
-        "handlers": ["console"],
+        "handlers": ["console", "file"],
         "level": "INFO",
     },
 }

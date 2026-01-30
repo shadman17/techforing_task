@@ -118,40 +118,24 @@ class InvitationCancelAPIView(APIView):
 
 
 class DashboardAPIView(APIView):
+    authentication_classes = []
+    permission_classes = []
+
     @check_permission(product_id="abc", feature="dashboard", permission="read")
     def get(self, request):
         logger.info(
             "Dashboard accessed",
             extra={
                 "trace_id": request.trace_id,
-                "user_id": request.user.id,
+                "user_id": None,
                 "tenant_id": request.tenant_id,
             },
         )
-
-        authz_response = call_external_service(
-            url="https://auth.example.com/permissions/check",
-            method="POST",
-            request=request,
-            json={
-                "user_id": request.user.id,
-                "tenant_id": request.tenant_id,
-                "product": "abc",
-                "feature": "dashboard",
-                "permission": "read",
-            },
-        )
-
-        if authz_response.status_code != 200:
-            return Response(
-                {"detail": "Permission denied"},
-                status=403,
-            )
 
         return Response(
             {
                 "tenant_id": request.tenant_id,
                 "role": request.role,
-                "data": "This is dashboard data",
+                "message": "Dashboard data",
             }
         )

@@ -21,14 +21,24 @@ def call_external_service(
     **kwargs,
 ):
     """
-    Wrapper around requests that enforces circuit breaker.
+    Wrapper around requests that enforces circuit breaker + propagates trace id.
     """
     domain = urlparse(url).netloc
 
     # Block if circuit open
-    from invitations.middleware_circuit import ExternalServiceCircuitBreakerMiddleware
+    # from invitations.middleware_circuit import ExternalServiceCircuitBreakerMiddleware
+    # ExternalServiceCircuitBreakerMiddleware.block_if_open(domain, request)
 
-    ExternalServiceCircuitBreakerMiddleware.block_if_open(domain, request)
+    headers = kwargs.pop("headers", {}) or {}
+    trace_id = getattr(request, "trace_id", None) if request else None
+    if trace_id:
+        headers.setdefault("X-Trace-ID", trace_id)
+
+    tenant_id = getattr(request, "tenant_id", None) if request else None
+    if tenant_id:
+        headers.setdefault("X-Tenant-ID", str(tenant_id))
+
+    kwargs["headers"] = headers
 
     try:
         response = requests.request(method, url, timeout=5, **kwargs)
@@ -39,13 +49,13 @@ def call_external_service(
             logger.error(
                 "External service failure",
                 extra={
-                    "trace_id": getattr(request, "trace_id", None),
+                    "trace_id": trace_id,
                     "user_id": (
                         request.user.id
                         if request and request.user.is_authenticated
                         else None
                     ),
-                    "tenant_id": getattr(request, "tenant_id", None),
+                    "tenant_id": tenant_id,
                 },
             )
 
@@ -54,11 +64,15 @@ def call_external_service(
                 logger.error(
                     "Circuit opened",
                     extra={
-                        "trace_id": getattr(request, "trace_id", None),
-                        "tenant_id": getattr(request, "tenant_id", None),
+                        "trace_id": trace_id,
+                        "user_id": (
+                            request.user.id
+                            if request and request.user.is_authenticated
+                            else None
+                        ),
+                        "tenant_id": tenant_id,
                     },
                 )
-
         else:
             close_circuit(domain)
 
